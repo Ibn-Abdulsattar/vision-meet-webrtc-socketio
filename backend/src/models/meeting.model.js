@@ -17,7 +17,6 @@ class Meeting extends Model {}
       meeting_code: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
       },
       date: {
         type: DataTypes.DATE,

@@ -156,7 +156,7 @@ export const authSlice = createSlice({
         state.error = null;
       })
             .addCase(getUserHistory.fulfilled, (state, action) => {
-        state.userHistory = action.payload;
+        state.userHistory = action.payload.meetings;
       })
             .addCase(addToHistory.fulfilled, (state, action) => {
         state.addHistory = action.payload.data;
@@ -177,6 +177,7 @@ export const authSlice = createSlice({
       );
   },
 });
+
 
 export const { user, isAuth, loader, error, userAllHistory, addHistory  } = authSlice.selectors;
 export const { clearError } = authSlice.actions;

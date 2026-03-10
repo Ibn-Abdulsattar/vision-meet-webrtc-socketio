@@ -18,6 +18,12 @@ import ScreenShareIcon from "@mui/icons-material/ScreenShare";
 import StopScreenShareIcon from "@mui/icons-material/StopScreenShare";
 import ChatIcon from "@mui/icons-material/Chat";
 import { useNavigate } from "react-router-dom";
+import JoinCall from "./JoinCall";
+import ChatModel from "./ChatModel";
+import CtrlBtn from "./CTRLBTN";
+import ControlBar from "./ControlBar";
+import ShowVideo from "./ShowVideo";
+import TopBar from "./TopBar";
 const server_url = import.meta.env.VITE_Backend_URL;
 
 const peerConfigConnections = {
@@ -577,12 +583,12 @@ export default function VideoMeet() {
     }
   };
 
-const handleChatModule = () => {
-  const next = !showModel;
-  setShowModel(next);
-  showModelRef.current = next;
-  setNewMessages(0);
-};
+  const handleChatModule = () => {
+    const next = !showModel;
+    setShowModel(next);
+    showModelRef.current = next;
+    setNewMessages(0);
+  };
 
   const sendMessage = (e) => {
     e.preventDefault();
@@ -619,283 +625,79 @@ const handleChatModule = () => {
   return (
     <Box>
       {askForUsername ? (
-        <Box>
-          <Typography variant="h4">Enter your username</Typography>
-          <form onSubmit={connect}>
-            <TextField
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <Button type="submit">Join</Button>
-          </form>
-          <br />
-          <video ref={localVideoRef} autoPlay muted playsInline />
-        </Box>
+        // JoinCall
+        <JoinCall
+          username={username}
+          setUsername={setUsername}
+          localVideoRef={localVideoRef}
+          connect={connect}
+        />
       ) : (
-        <div className="meetVideoContainer min-h-screen">
-          <video
-            className="meetUserVideo"
-            ref={localVideoRef}
-            autoPlay
-            muted
-            playsInline
-          />
+        <Box
+          sx={{
+            minHeight: "100vh",
+            height: "100vh",
+            background: "#0d1117",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+          }}
+        >
+          {/* Top bar */}
+          <TopBar videos={videos} />
 
-          {showModel && (
-            <Box
-              sx={{
-                position: "absolute",
-                height: "90vh",
-                width: "22rem",
-                top: 12,
-                right: 12,
-                background:
-                  "linear-gradient(145deg, rgba(15,15,25,0.97) 0%, rgba(25,20,40,0.97) 100%)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "1.5rem",
-                display: "flex",
-                flexDirection: "column",
-                overflow: "hidden",
-              }}
-            >
-              {/* Header */}
+          {/* Content */}
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              overflow: "hidden",
+              p: "10px",
+              gap: "10px",
+              minHeight: 0,
+            }}
+          >
+            {/* Video grid */}
+            <ShowVideo localVideoRef={localVideoRef} videos={videos} />
+
+            {/* Chat panel */}
+            {showModel && (
               <Box
                 sx={{
-                  px: "1.25rem",
-                  py: "1rem",
-                  borderBottom: "1px solid rgba(255,255,255,0.07)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1.5,
+                  width: 300,
                   flexShrink: 0,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    background: "#4ade80",
-                    boxShadow: "0 0 8px #4ade80",
-                  }}
-                />
-                <Typography
-                  sx={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: 700,
-                    fontSize: "1rem",
-                    letterSpacing: "0.06em",
-                    textTransform: "uppercase",
-                    color: "rgba(255,255,255,0.9)",
-                  }}
-                >
-                  Live Chat
-                </Typography>
-              </Box>
-
-              {/* Messages */}
-              <Box
-                sx={{
-                  flex: 1,
-                  overflowY: "auto",
-                  px: "1.25rem",
-                  py: "1rem",
+                  background: "#111827",
+                  border: "1px solid #1e3a5f",
+                  borderRadius: "12px",
+                  overflow: "auto",
                   display: "flex",
                   flexDirection: "column",
-                  gap: 1.5,
                 }}
               >
-                {messages.length > 0 ? (
-                  messages.map((item, idx) => (
-                    <Box
-                      key={idx}
-                      sx={{
-                        animation: "fadeUp 0.25s ease forwards",
-                        "@keyframes fadeUp": {
-                          from: { opacity: 0, transform: "translateY(8px)" },
-                          to: { opacity: 1, transform: "translateY(0)" },
-                        },
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "0.7rem",
-                          fontWeight: 700,
-                          letterSpacing: "0.08em",
-                          textTransform: "uppercase",
-                          color: "#a78bfa",
-                          mb: 0.4,
-                        }}
-                      >
-                        {item.sender}
-                      </Typography>
-                      <Box
-                        sx={{
-                          background: "rgba(255,255,255,0.05)",
-                          border: "1px solid rgba(255,255,255,0.07)",
-                          borderRadius: "0 0.75rem 0.75rem 0.75rem",
-                          px: "0.875rem",
-                          py: "0.6rem",
-                        }}
-                      >
-                        <Typography
-                          sx={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            fontSize: "0.875rem",
-                            color: "rgba(255,255,255,0.82)",
-                            lineHeight: 1.5,
-                          }}
-                        >
-                          {item.data}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ))
-                ) : (
-                  <Box
-                    sx={{
-                      flex: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 1,
-                      opacity: 0.4,
-                      mt: 6,
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "2rem",
-                        lineHeight: 1,
-                      }}
-                    >
-                      💬
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "0.85rem",
-                        color: "rgba(255,255,255,0.6)",
-                        letterSpacing: "0.04em",
-                      }}
-                    >
-                      No messages yet
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
-
-              {/* Input Area */}
-              <Box
-                sx={{
-                  px: "1rem",
-                  py: "1rem",
-                  borderTop: "1px solid rgba(255,255,255,0.07)",
-                  flexShrink: 0,
-                }}
-              >
-                <form
-                  onSubmit={sendMessage}
-                  style={{
-                    display: "flex",
-                    gap: "0.5rem",
-                    alignItems: "center",
-                  }}
-                >
-                  <TextField
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Say something..."
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "0.875rem",
-                        color: "rgba(255,255,255,0.85)",
-                        background: "rgba(255,255,255,0.05)",
-                        borderRadius: "0.75rem",
-                      },
-                    }}
-                  />
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{
-                      minWidth: "unset",
-                      width: "2.5rem",
-                      height: "2.5rem",
-                      p: 0,
-                      borderRadius: "0.75rem",
-                      background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
-                      boxShadow: "0 4px 14px rgba(124,58,237,0.5)",
-                      transition: "all 0.2s ease",
-                      flexShrink: 0,
-                      "&:hover": {
-                        background: "linear-gradient(135deg, #6d28d9, #7c3aed)",
-                        transform: "translateY(-1px)",
-                        boxShadow: "0 6px 20px rgba(124,58,237,0.6)",
-                      },
-                      "&:active": { transform: "scale(0.95)" },
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"
-                        stroke="white"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </Button>
-                </form>
-              </Box>
-            </Box>
-          )}
-
-          <div className="buttonContainer">
-            <IconButton onClick={handleVideo}>
-              {video ? <VideocamOffIcon /> : <VideocamIcon />}
-            </IconButton>
-            <IconButton onClick={endCall}>
-              <CallEndIcon className="callEnd" />
-            </IconButton>
-            <IconButton onClick={handleAudio}>
-              {audio ? <MicOffIcon /> : <MicIcon />}
-            </IconButton>
-            <IconButton onClick={handleScreen}>
-              {screen ? <StopScreenShareIcon /> : <ScreenShareIcon />}
-            </IconButton>
-            <Badge badgeContent={newMessages} color="secondary">
-              <IconButton onClick={handleChatModule}>
-                {showModel ? <SpeakerNotesOffIcon /> : <ChatIcon />}
-              </IconButton>
-            </Badge>
-          </div>
-
-          <div className="conferenceView">
-            {videos.map((video) => (
-              <div className="" key={video.socketId}>
-                <video
-                  data-socket={video.socketId}
-                  ref={(ref) => {
-                    if (ref && video.stream) {
-                      ref.srcObject = video.stream;
-                    }
-                  }}
-                  autoPlay
-                  playsInline
+                <ChatModel
+                  messages={messages}
+                  sendMessage={sendMessage}
+                  message={message}
+                  setMessage={setMessage}
                 />
-              </div>
-            ))}
-          </div>
-        </div>
+              </Box>
+            )}
+          </Box>
+
+          {/* Control bar */}
+          <ControlBar
+            handleVideo={handleVideo}
+            video={video}
+            handleAudio={handleAudio}
+            audio={audio}
+            endCall={endCall}
+            handleScreen={handleScreen}
+            screen={screen}
+            newMessages={newMessages}
+            handleChatModule={handleChatModule}
+            showModel={showModel}
+          />
+        </Box>
       )}
     </Box>
   );

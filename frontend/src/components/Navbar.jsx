@@ -1,94 +1,221 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import RestoreIcon from "@mui/icons-material/Restore";
 import HomeIcon from "@mui/icons-material/Home";
-import { Box, Button, Typography } from "@mui/material";
-import { useDispatch } from "react-redux";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
+import { Box, Button, Typography, IconButton } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { logout } from "../redux/slices/auth.slice";
-import LogoutIcon from '@mui/icons-material/Logout';
+import { isAuth, logout } from "../redux/slices/auth.slice";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 export default function Navbar(mode) {
+  const auth = useSelector(isAuth);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dispatch = useDispatch();
   const m = mode.mode;
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      await dispatch(logout()).unwrap();
-      toast.success("Logged out successsfuly!");
+  const icon = m === "home" ?  <HomeIcon/> : <RestoreIcon/>
+
+  const handleAuth = async () => {
+    if (auth) {
+      try {
+        await dispatch(logout()).unwrap();
+        toast.success("Logged out successsfuly!");
+        navigate("/auth");
+      } catch (e) {
+        toast.error(e.message);
+      }
+    } else {
       navigate("/auth");
-    } catch (e) {
-      toast.error(e.message);
     }
   };
 
-  const handleHistory = (e) => {
-    e.preventDefault();
-    navigate(`/${m}`);
-  };
+  const navItems = [
+    { label: "Join as Guest", path: "/aljk23" },
+    { label: "Register", path: "/auth" },
+  ];
+
+  const authItems =
+    m === "home"
+      ? [{ label: "Home", path: "/home" }]
+      : [{ label: "History", path: "/history" }];
+
+  const items = auth ? authItems : navItems;
+
   return (
     <nav>
+      {/* ── Navbar ── */}
       <Box
+        component="nav"
         sx={{
           display: "flex",
-          justifyContent: "space-between",
           alignItems: "center",
-          px: { xs: 2, sm: 4, md: 6 },
+          justifyContent: "space-between",
+          px: { xs: 2.5, md: 6 },
           py: 2,
-          borderBottom: "1px solid rgba(167,139,250,0.12)",
-          backdropFilter: "blur(12px)",
+          borderBottom: "1px solid #1e3a5f",
+          position: "relative",
+          zIndex: 100,
+          // background: "#0d1117",
         }}
       >
-        {/* Heading */}
-        <Box>
+        {/* Logo */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Typography
-            variant="h5"
             sx={{
+              fontSize: { xs: 16, md: 18 },
               fontWeight: 800,
-              fontSize: { xs: "1.2rem", sm: "1.5rem" },
-              background: "#000",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              letterSpacing: "-0.5px",
+              color: "#ffffff",
+              fontFamily: "monospace",
+              letterSpacing: "0.06em",
             }}
           >
-            Vision Meet
+            VISION MEET
           </Typography>
         </Box>
 
-        {/* Button container */}
-        <Box sx={{ display: "flex", gap: 1 }}>
+        {/* Desktop nav */}
+        <Box
+          sx={{
+            display: { xs: "none", md: "flex" },
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          {items.map((item) => (
+            <Button
+              key={item.label}
+              onClick={() => navigate(item.path)}
+              sx={{
+                color: "rgba(255,255,255,0.5)",
+                fontFamily: "monospace",
+                fontSize: 13,
+                fontWeight: 600,
+                letterSpacing: "0.06em",
+                textTransform: "none",
+                px: 2,
+                py: 1,
+                borderRadius: "8px",
+                "&:hover": {
+                  color: "#fff",
+                  bgcolor: "rgba(255,255,255,0.05)",
+                },
+              }}
+              startIcon={(auth && m) ? icon : undefined}
+            >
+              {item.label}
+            </Button>
+          ))}
           <Button
-            onClick={handleHistory}
+            onClick={handleAuth}
             sx={{
-              px: { xs: 1.5, sm: 2 },
-              fontSize: { xs: "0.75rem", sm: "0.875rem" },
-              fontWeight: 500,
+              ml: 1,
+              bgcolor: "#2563eb",
+              color: "#fff",
+              fontFamily: "monospace",
+              fontSize: 13,
+              fontWeight: 600,
+              letterSpacing: "0.06em",
+              textTransform: "none",
+              px: 2.5,
+              py: 1,
+              borderRadius: "8px",
+              "&:hover": { bgcolor: "#1d4ed8" },
             }}
-            startIcon={
-              m === "history" ? (
-                <RestoreIcon sx={{ fontSize: "1rem" }} />
-              ) : (
-                <HomeIcon sx={{ fontSize: "1rem" }} />
-              )
-            }
+            endIcon={<LogoutIcon />}
           >
-            {m === "history" ? "History" : "Home"}
-          </Button>
-
-          <Button
-            variant="text"
-            onClick={handleLogout}
-            startIcon={<LogoutIcon sx={{ fontSize: "1rem" }}/>}
-            sx={{
-              fontWeight: 500,
-              px: { xs: 1.5, sm: 2 },
-            }}
-          >
-            Logout
+            {auth ? "Logout" : "Login"}
           </Button>
         </Box>
+
+        {/* Mobile hamburger */}
+        <IconButton
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          sx={{
+            display: { xs: "flex", md: "none" },
+            color: "rgba(255,255,255,0.7)",
+            bgcolor: "rgba(255,255,255,0.05)",
+            border: "1px solid #1e3a5f",
+            borderRadius: "8px",
+            p: 1,
+          }}
+        >
+          {isMenuOpen ? (
+            <CloseIcon fontSize="small" />
+          ) : (
+            <MenuIcon fontSize="small" />
+          )}
+        </IconButton>
       </Box>
+
+      {/* Mobile menu */}
+      {isMenuOpen && (
+        <Box
+          sx={{
+            display: { xs: "flex", md: "none" },
+            flexDirection: "column",
+            px: 2.5,
+            py: 2,
+            borderBottom: "1px solid #1e3a5f",
+            background: "#111827",
+            gap: 0.5,
+            zIndex: 99,
+            position: "absolute",
+            width: "100%",
+            transition: "all 1s ease"
+          }}
+        >
+          {items.map((item) => (
+            <Button
+              key={item.label}
+              onClick={() => {
+                navigate(item.path);
+                setIsMenuOpen(false);
+              }}
+              fullWidth
+              sx={{
+                justifyContent: "flex-start",
+                color: "rgba(255,255,255,0.6)",
+                fontFamily: "monospace",
+                fontSize: 13,
+                fontWeight: 600,
+                letterSpacing: "0.06em",
+                textTransform: "none",
+                px: 2,
+                py: 1.25,
+                borderRadius: "8px",
+                "&:hover": { color: "#fff", bgcolor: "rgba(255,255,255,0.05)" },
+              }}
+            >
+              {item.label}
+            </Button>
+          ))}
+                    <Button
+            onClick={handleAuth}
+            sx={{
+                justifyContent: "flex-start",
+              ml: 1,
+              bgcolor: "#2563eb",
+              color: "#fff",
+              fontFamily: "monospace",
+              fontSize: 13,
+              fontWeight: 600,
+              letterSpacing: "0.06em",
+              textTransform: "none",
+                px: 2,
+                py: 1.25,
+              borderRadius: "8px",
+              "&:hover": { bgcolor: "#1d4ed8" },
+            }}
+            endIcon={<LogoutIcon />}
+          >
+            {auth ? "Logout" : "Login"}
+          </Button>
+        </Box>
+      )}
     </nav>
   );
 }
