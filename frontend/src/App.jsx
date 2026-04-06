@@ -6,7 +6,7 @@ import Landing from "./landingPages/landing/Landing";
 import Home from "./landingPages/home/Home";
 import { ToastContainer } from "react-toastify";
 import History from "./landingPages/history/History";
-import ProtectedRoute from "./components/protectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (

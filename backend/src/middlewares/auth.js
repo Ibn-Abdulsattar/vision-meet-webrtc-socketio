@@ -11,7 +11,7 @@ const auth =
     if (!token) {
       const authHeader = req.headers.authorization;
       if (authHeader?.startsWith("Bearer ")) {
-        token = authHeader.split(" ")[1]; // .split used to break string into smaller pieces of array based on seprator
+        token = authHeader.split(" ")[1]; 
       }
     }
 
@@ -28,7 +28,6 @@ const auth =
       const decoded = jwt.verify(token, JWT_SECRET);
       const user = decoded.payload;
 
-      // RBAC Check
       if (role === "admin" && user.role !== "admin") {
         return next(
           new ExpressError("Admin access only", 403)

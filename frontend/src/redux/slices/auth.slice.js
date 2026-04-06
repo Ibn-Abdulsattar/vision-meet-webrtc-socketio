@@ -28,15 +28,15 @@ export const login = createAsyncThunk(
       localStorage.setItem("token", response.data.token);
       return response.data;
     } catch (error) {
-    localStorage.removeItem("token")
+      localStorage.removeItem("token");
       return rejectWithValue(error.response?.data?.message || "Login failed");
     }
   },
 );
 
 export const logout = createAsyncThunk("auth/logout", async () => {
-   await API_Base.post(`/logout`, {});
-    localStorage.removeItem("token")
+  await API_Base.post(`/logout`, {});
+  localStorage.removeItem("token");
 });
 
 export const forgot = createAsyncThunk(
@@ -61,7 +61,7 @@ export const verifyOtp = createAsyncThunk(
       localStorage.setItem("token", response.data.token);
       return response.data;
     } catch (error) {
-    localStorage.removeItem("token")
+      localStorage.removeItem("token");
       return rejectWithValue(
         error.response?.data?.message || "Verification failed!",
       );
@@ -119,15 +119,15 @@ export const authSlice = createSlice({
     isLoading: false,
     error: null,
     userHistory: [],
-    addHistory: null
+    addHistory: null,
   },
   selectors: {
     user: (state) => state.user,
     isAuth: (state) => state.isAuth,
     loader: (state) => state.isLoading,
     error: (state) => state.error,
-    userAllHistory: (state)=> state.userHistory,
-    addToHistory: (state)=> state.addHistory
+    userAllHistory: (state) => state.userHistory,
+    addToHistory: (state) => state.addHistory,
   },
   reducers: {
     clearError: (state) => {
@@ -160,14 +160,14 @@ export const authSlice = createSlice({
         state.isAuth = false;
         state.error = null;
       })
-            .addCase(getUserHistory.fulfilled, (state, action) => {
+      .addCase(getUserHistory.fulfilled, (state, action) => {
         state.userHistory = action.payload.meetings;
       })
-            .addCase(addToHistory.fulfilled, (state, action) => {
+      .addCase(addToHistory.fulfilled, (state, action) => {
         state.addHistory = action.payload.data;
       })
       .addMatcher(
-        (action) =>  action.type.endsWith("/pending"),
+        (action) => action.type.endsWith("/pending"),
         (state) => {
           state.isLoading = true;
           state.error = null;
@@ -183,7 +183,7 @@ export const authSlice = createSlice({
   },
 });
 
-
-export const { user, isAuth, loader, error, userAllHistory, addHistory  } = authSlice.selectors;
+export const { user, isAuth, loader, error, userAllHistory, addHistory } =
+  authSlice.selectors;
 export const { clearError } = authSlice.actions;
 export default authSlice.reducer;
